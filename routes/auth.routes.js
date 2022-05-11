@@ -37,11 +37,11 @@ if (passwordRegex.test(password) === false) {
 
 try {
     // VALIDAR SI EL USUARIO ESTA EN LA DB
-    const foundUser = await UserModel.findOne({ $or: [{username: username}, {password: password}]})
+    const foundUser = await UserModel.findOne( {username: username} )
     console.log(foundUser)
     if (foundUser !== null) {
         res.render("auth/signup", {
-            errorMesage: "El usuario ya está registrado."
+            errorMessage: "El usuario ya está registrado."
         })
         return;
     }
@@ -58,7 +58,7 @@ try {
         password: hashPassword
     })
 
-    res.redirect("/")
+    res.redirect("/auth/login")
 
 }
 catch(err) {
@@ -66,6 +66,63 @@ catch(err) {
 }
 })
 
+// GET "/auth/login"
+router.get("/login", (req, res, next) => {
+    res.render("auth/login.hbs")
+})
+
+// POST "/auth/login"
+
+router.post("/login", async (req, res, next) => {
+
+    const { username, password } = req.body
+
+    // Campos no pueden estar vacíos.
+    if (!username || !password) {
+        res.render("auth/login", {
+            errorMessage: "¡Debes rellenar todos los campos!"
+        })
+        return;
+    }
+
+    try {
+
+        // Validar que el usuario exista en mi DB.
+        const userExists = await UserModel.findOne( {username: username} )
+        if (!userExists) {
+            res.render("auth/login", {
+                errorMessage: "El usuario no existe en la base de datos."
+            })
+            return;
+        }
+
+        // Validar que el password que se introduce es el mismo que el que estaba guardado.
+        const passwordCheck = await bcryptjs.compare(password, userExists.password)
+        if (!passwordCheck) {
+            res.render("auth/login", {
+                errorMessage: "La contraseña introducida no es válida."
+            })
+            return;
+        }
+
+        // Con esto, crearemos una nueva sesión para el usuario.
+        console.log(req.session.user);
+        req.session.user = userExists;
+
+        //! req.app.locals ES ALGO PREDEFINIDO y es donde GUARDAMOS LAS VARIABLES GLOBALES.
+        req.app.locals.userSessionActive = true
+
+        // Redireccionamos al perfil al loguearnos...
+
+        res.redirect("/profile/index")
+
+    }
+
+    catch(err){
+        next(err)
+    }
+
+})
 
 
 
