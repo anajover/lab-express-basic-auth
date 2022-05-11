@@ -1,8 +1,25 @@
 const router = require("express").Router();
 
-// GET "/profile/index"
-router.get("/index", (req, res, next) => {
+const isLoggedIn = require("../middlewares/isLoggedIn.js")
+
+
+// GET "/profile/private"
+// if (isLoggedIn){
+// router.get("/private", (req, res, next) => {
+//     res.render("profile/index.hbs")
+// })} else {
+
+// router.get("/main", (req, res, next) => {
+//     res.render("profile/main.hbs")
+// })
+// }
+
+router.get("/private", isLoggedIn, (req, res, next) => {
     res.render("profile/index.hbs")
 })
 
-module.exports = router
+router.get("/main", isLoggedIn, (req, res, next) => {
+    res.render("profile/main.hbs")
+} )
+
+module.exports = router;

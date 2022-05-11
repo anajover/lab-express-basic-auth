@@ -109,12 +109,19 @@ router.post("/login", async (req, res, next) => {
         console.log(req.session.user);
         req.session.user = userExists;
 
+        if (req.session.user === true) {
+            res.redirect("/profile/private")
+        } else {
+            res.redirect("/profile/main")
+        }
+
+
         //! req.app.locals ES ALGO PREDEFINIDO y es donde GUARDAMOS LAS VARIABLES GLOBALES.
-        req.app.locals.userSessionActive = true
+        req.app.locals.userSessionActive = true;
 
         // Redireccionamos al perfil al loguearnos...
 
-        res.redirect("/profile/index")
+        res.redirect("/profile/private")
 
     }
 
