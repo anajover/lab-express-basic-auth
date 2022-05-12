@@ -129,6 +129,18 @@ router.post("/login", async (req, res, next) => {
         next(err)
     }
 
+    // POST "/auth/logout"
+    // cerrar sesion del usuario
+    router.post("/logout", (req, res, next) => {
+
+        // se cierra sesion
+        req.session.destroy()
+        req.app.locals.userSessionActive = false;
+
+        // redireccionamos al usuario
+        res.redirect("/")
+    })
+
 })
 
 
